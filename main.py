@@ -13,11 +13,19 @@ hotels = [
 '''Создание второй ручки hotels'''
 @app.get("/hotels")
 def get_hotels(
-    id: int,  # id - параметр, который будет передаваться в URL
-
-    title: str,  # title - параметр, который будет передаваться в URL
+    id: int | None = Query(None, description="Айдишник"),  # id - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
+                                              # int | None - означает, что параметр необязателен к заполнению в FastAPI
+    title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
+                                              # str | None - означает, что параметр необязателен к заполнению в FastAPI
 ):
-    return [hotel for hotel in hotels if hotel["title"] == title and hotel["id"] == id]  # Возврщение списка отфильтрованных hotel
+    hotels_ = []
+    for hotel in hotels:
+        if id and hotel["id"] != id:
+            continue
+        if title and hotel["title"] != title:
+            continue
+        hotels_.append(hotel)
+    return hotels_
 
 
 '''Создание первой основной ручки'''
