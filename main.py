@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import uvicorn
 
 app = FastAPI()  # Приложение - объект класса FastAPI
@@ -12,8 +12,12 @@ hotels = [
 
 '''Создание второй ручки hotels'''
 @app.get("/hotels")
-def get_hotels():
-    return hotels
+def get_hotels(
+    id: int,  # id - параметр, который будет передаваться в URL
+
+    title: str,  # title - параметр, который будет передаваться в URL
+):
+    return [hotel for hotel in hotels if hotel["title"] == title and hotel["id"] == id]  # Возврщение списка отфильтрованных hotel
 
 
 '''Создание первой основной ручки'''
