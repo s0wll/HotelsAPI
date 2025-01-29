@@ -6,8 +6,8 @@ app = FastAPI()  # Приложение - объект класса FastAPI
 
 
 hotels = [
-    {"id": 1, "title": "Sochi"},
-    {"id": 2, "title": "Дубай"},
+    {"id": 1, "title": "Sochi", "name": "sochi"},
+    {"id": 2, "title": "Дубай", "name": "dubai"},
 ]
 
 '''Создание второй ручки hotels'''
@@ -32,7 +32,7 @@ def get_hotels(
 # body, request body
 @app.post("/hotels")
 def create_hotel(
-    title: str = Body(embed=True),
+    title: str = Body(embed=True),  # title - параметр, который будет передаваться в теле запроса, Body - декоратор для передачи данных не через Query
 ):
     global hotels
     hotels.append({
