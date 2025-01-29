@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Body
 import uvicorn
 
 app = FastAPI()  # Приложение - объект класса FastAPI
@@ -26,6 +26,20 @@ def get_hotels(
             continue
         hotels_.append(hotel)
     return hotels_
+
+
+'''Создание POST ручки на добавление отелей'''
+# body, request body
+@app.post("/hotels")
+def create_hotel(
+    title: str = Body(embed=True),
+):
+    global hotels
+    hotels.append({
+        "id": hotels[-1]["id"] + 1,
+        "title": title
+    })
+    return {"status": "OK"}
 
 
 '''Создание ручки удаления для /hotels'''
