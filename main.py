@@ -28,6 +28,13 @@ def get_hotels(
     return hotels_
 
 
+'''Создание ручки удаления для /hotels'''
+@app.delete("/hotels/{hotel_id}")
+def delete_hotel(hotel_id: int):
+    global hotels
+    hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
+    return {"status": "OK"}
+
 '''Создание первой основной ручки'''
 @app.get("/")  # HTTP метод GET для получения данных
 def func():
