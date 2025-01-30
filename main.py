@@ -57,7 +57,11 @@ def edit_hotel(
 
 
 '''Создание PATCH ручки для частичного или полного изменения отеля'''
-@app.patch("/hotels/{hotel_id}")
+@app.patch(
+        "/hotels/{hotel_id}",
+        summary="Частичное обновление данных об отеле",
+        description="Тут мы частично обновляем данные об отеле: можно отправить name, а можно title"
+)
 def partially_edit_hotel(
     hotel_id: int,
     title: str | None = Body(None),
@@ -70,8 +74,6 @@ def partially_edit_hotel(
     if name:
         hotel["name"] = name
     return {"status": "OK"}
-
-# git commit -m "fix: improve code for PUT and PATCH endpoints"
 
 
 '''Создание ручки удаления для /hotels'''
