@@ -1,5 +1,5 @@
-from fastapi import Query, Body, APIRouter
-from pydantic import BaseModel
+from fastapi import Query, APIRouter
+from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция роутер для подключения ручек hotels к приложению
 
@@ -36,6 +36,10 @@ def get_hotels(
 class Hotel(BaseModel):  # Класс Hotel для удобного использования данных в коде (принцип dry). BaseModel - класс библиотеки Pydantic
     title: str
     name: str
+
+class HotelPATCH(BaseModel): 
+    title: str | None = Field(None)
+    name: str | None = Field(None)
 
 
 '''Создание POST ручки на добавление отелей'''
@@ -80,15 +84,14 @@ def edit_hotel(
 )
 def partially_edit_hotel(
     hotel_id: int,
-    title: str | None = Body(None),
-    name: str | None = Body(None),
+    hotel_data: HotelPATCH,
 ):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
-    if title:
-        hotel["title"] = title
-    if name:
-        hotel["name"] = name
+    if hotel_data.title:
+        hotel["title"] = hotel_data.title
+    if hotel_data.name:
+        hotel["name"] = hotel_data.name
     return {"status": "OK"}
 
 
