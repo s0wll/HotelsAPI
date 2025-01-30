@@ -1,4 +1,5 @@
 from fastapi import Query, Body, APIRouter
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция роутер для подключения ручек hotels к приложению
 
@@ -32,6 +33,11 @@ def get_hotels(
     return hotels_
 
 
+class Hotel(BaseModel):  # Класс Hotel для удобного использования данных в коде (принцип dry). BaseModel - класс библиотеки Pydantic
+    title: str
+    name: str
+
+
 '''Создание POST ручки на добавление отелей'''
 # body, request body
 @router.post(
@@ -39,13 +45,12 @@ def get_hotels(
         summary="Добавление отеля",
         description="Тут можно добавить новый отель",
 )
-def create_hotel(
-    title: str = Body(embed=True),  # title - параметр, который будет передаваться в теле запроса, Body - декоратор для передачи данных не через Query
-):
+def create_hotel(hotel_data: Hotel):  # Использование в качестве параметров атрибуты из класса Hotel
     global hotels
     hotels.append({
         "id": hotels[-1]["id"] + 1,
-        "title": title
+        "title": hotel_data.title,
+        "name": hotel_data.name,
     })
     return {"status": "OK"}
 
@@ -58,13 +63,12 @@ def create_hotel(
 )
 def edit_hotel(
     hotel_id: int,  # Параметр пути Path() (т.к. в пути app.put мы указали hotel_id, то в параметрах основной функции это будет именно Path() параметр)
-    title: str = Body(),
-    name: str =  Body(),
+    hotel_data: Hotel,  # Использование в качестве параметров атрибуты из класса Hotel
 ):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
-    hotel["title"] = title
-    hotel["name"] = name
+    hotel["title"] = hotel_data.title
+    hotel["name"] = hotel_data.name
     return {"status": "OK"}
 
 
