@@ -1,5 +1,19 @@
-venv/
+# Байт-код, оптимизированные / DLL-файлы
 __pycache__/
-.DS_Store
+*.py[cod]
+
+# Файлы конфигурации для venv
+venv/
 .env
-.test.env
+
+# Файлы дистрибутивов и артефакты упаковки
+dist/
+*.egg-info/
+
+# Файлы покрытия, кэши и прочие ненужные файлы
+.coverage
+*.py,cover
+.cache/
+
+# Файлы MacOS
+.DS_Store
