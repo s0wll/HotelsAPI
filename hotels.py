@@ -29,14 +29,23 @@ def get_hotels(
                                               # int | None - означает, что параметр необязателен к заполнению в FastAPI
     title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # str | None - означает, что параметр необязателен к заполнению в FastAPI
+    page: int | None = Query(None, gt=1, description="Номер страницы"),  # Пагинация  # gt и lt - это ограничения, которые можно указать для параметра (greaterthan lessthen)
+                                                                                      # Таким образом мы делаем валидацию Pydantic (FastAPI уже вшил ее, поэтому можно исп gt и lt) для пагинации
+    per_page: int | None = Query(None, gt=1, lt=30, description="Количество отелей на одной странице"),  # Пагинация
 ):
     hotels_ = []
+
     for hotel in hotels:
         if id and hotel["id"] != id:
             continue
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
+
+    if page and per_page:  # if page и per_page переданы
+        return hotels_[per_page * (page - 1):][:per_page]  # Решение учителя
+        #return hotels_[per_page * (page - 1):per_page * page] # Я решил так
+
     return hotels_
 
 
