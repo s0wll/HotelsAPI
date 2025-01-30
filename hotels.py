@@ -1,6 +1,6 @@
 from fastapi import Query, Body, APIRouter
 
-router = APIRouter(prefix="/hotels", tags=["Отели"])
+router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция роутер для подключения ручек hotels к приложению
 
 
 

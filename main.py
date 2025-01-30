@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Query, Body
 import uvicorn
 
-from hotels import router as router_hotels
+from hotels import router as router_hotels  # Импорт роутера hotels
 
 app = FastAPI()  # Приложение - объект класса FastAPI
 
-app.include_router(router_hotels)
+app.include_router(router_hotels)  # Подключение роутера hotels к приложению
 
 
 '''Создание первой основной ручки'''
