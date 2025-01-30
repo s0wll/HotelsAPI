@@ -49,10 +49,50 @@ def delete_hotel(hotel_id: int):
     hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
     return {"status": "OK"}
 
+
+'''Создание PUT ручки для полного изменения отеля (кроме id)'''
+@app.put("/hotels/{hotel_id}")
+def edit_hotel(
+    hotel_id: int,
+    title: str = Body(embed=True, description="Новое название"),
+    name: str =  Body(embed=True, description="Новое имя"),
+):
+    global hotels
+    new_title = title
+    new_name = name
+    for hotel in hotels:
+        if hotel["id"] == hotel_id:
+            hotels[hotel_id - 1]["title"] = new_title
+            hotels[hotel_id - 1]["name"] = new_name
+    return hotels[hotel_id - 1]
+
+
+'''Создание PATCH ручки для частичного или полного изменения отеля'''
+@app.patch("/hotels/{hotel_id}")
+def update_hotel_partly(
+    hotel_id: int,
+    title: str | None = Query(None, description="Новое название"),
+    name: str | None = Query(None, description="Новое имя"),
+):
+    global hotels
+    for hotel in hotels:
+        if hotel["id"] == hotel_id and title != None and name == None:
+            hotels[hotel_id - 1]["title"] = title
+            name = hotels[hotel_id - 1]["name"]
+        elif hotel["id"] == hotel_id and name != None and title == None:
+            hotels[hotel_id - 1]["name"] = name
+            title = hotels[hotel_id - 1]["title"]
+        elif hotel["id"] == hotel_id and name != None and title != None:
+            hotels[hotel_id - 1]["title"] = title
+            hotels[hotel_id - 1]["name"] = name 
+        return hotels[hotel_id - 1]
+
+
 '''Создание первой основной ручки'''
 @app.get("/")  # HTTP метод GET для получения данных
 def func():
     return "Hello World!"
+
 
 if __name__ == "__main__":  # Запуск приложения сервера через uvicorn
     uvicorn.run("main:app", reload=True)
