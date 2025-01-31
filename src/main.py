@@ -8,6 +8,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from src.api.hotels import router as router_hotels  # Импорт роутера hotels
 
+from src.database import *
 
 app = FastAPI()  # Приложение - объект класса FastAPI
 
@@ -23,5 +24,3 @@ def func():
 if __name__ == "__main__":  # Запуск приложения сервера через uvicorn
     uvicorn.run("main:app", reload=True)
 
-
-# add new libraries sqlalchemy, alembic, asyncpg for working with database and connect database
