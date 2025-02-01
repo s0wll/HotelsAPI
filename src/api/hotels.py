@@ -1,8 +1,8 @@
 from fastapi import Query, APIRouter, Body
 
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 
-from src.database import engine
+# from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
 from models.hotels import HotelsOrm
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
@@ -26,33 +26,34 @@ hotels = [
     {"id": 7, "title": "Санкт-Петербург", "name": "spb"},
 ]
 
-'''Создание второй ручки hotels'''
+'''Создание второй ручки hotels на получение отелей'''
 @router.get(
         "",
         summary="Получение отеля",
         description="Тут можно получить определенный отель или все отели",
 )
-def get_hotels(
+async def get_hotels(
     pagination: PaginationDep,
     id: int | None = Query(None, description="Айдишник"),  # id - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # int | None - означает, что параметр необязателен к заполнению в FastAPI
     title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # str | None - означает, что параметр необязателен к заполнению в FastAPI
 ):
-    hotels_ = []
+    async with async_session_maker() as session:
+        query = select(HotelsOrm)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query
+        result = await session.execute(query)
 
-    for hotel in hotels:
-        if id and hotel["id"] != id:
-            continue
-        if title and hotel["title"] != title:
-            continue
-        hotels_.append(hotel)
+        hotels = result.scalars().all()
+        # print(type(hotels), hotels)  # Принт в консоль для дебага (или можно в database.py у объекта engine приписать параметр echo=True)
+        return hotels
+        # commit() не нужно вызывать в select, т.к. commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
 
-    if pagination.page and pagination.per_page:  # if page и per_page переданы
-        return hotels_[pagination.per_page * (pagination.page - 1):][:pagination.per_page]  # Решение учителя
+
+
+    # if pagination.page and pagination.per_page:  # if page и per_page переданы
+        # return hotels_[pagination.per_page * (pagination.page - 1):][:pagination.per_page]  # Решение учителя
         #return hotels_[per_page * (page - 1):per_page * page] # Я решил так
 
-    return hotels_
 
 
 '''Создание POST ручки на добавление отелей'''
@@ -74,9 +75,9 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={  # # Испо
 ):  
     async with async_session_maker() as session:  # Сессия (транзакция в БД) для отправления запроса в БД
         add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-        print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))  # Вывод SQL запроса в консоль для дебага (делается только на этапе разработки для себя)
+        # print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))  # Вывод SQL запроса в консоль для дебага (делается только на этапе разработки для себя)
         await session.execute(add_hotel_stmt)
-        await session.commit()
+        await session.commit()  # commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
 
     return {"status": "OK"}
 
