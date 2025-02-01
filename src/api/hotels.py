@@ -2,6 +2,7 @@ from fastapi import Query, APIRouter, Body
 
 from sqlalchemy import insert
 
+from src.database import engine
 from models.hotels import HotelsOrm
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
@@ -71,8 +72,9 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={  # # Испо
     }}, 
 })
 ):  
-    async with async_session_maker() as session:
+    async with async_session_maker() as session:  # Сессия (транзакция в БД) для отправления запроса в БД
         add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
+        print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))  # Вывод SQL запроса в консоль для дебага (делается только на этапе разработки для себя)
         await session.execute(add_hotel_stmt)
         await session.commit()
 
