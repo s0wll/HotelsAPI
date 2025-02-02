@@ -1,6 +1,6 @@
 from fastapi import Query, APIRouter, Body
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, func  # func общий метод для использования любых функций, которые есть в БД
 
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
@@ -29,10 +29,10 @@ async def get_hotels(
     async with async_session_maker() as session:
         query = select(HotelsOrm)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query 
         if title:
-            query = query.filter(HotelsOrm.title.like(f"%{title}%"))  # like - функция, которая позволяет указать шаблон для поиска (по подстроке)
+            query = query.filter(func.lower(HotelsOrm.title).like(f"%{title.strip().lower()}%"))  # like - функция, которая позволяет указать шаблон для поиска (по подстроке)
             # query = query.filter(HotelsOrm.title.contains(title))
         if location:
-            query = query.filter(HotelsOrm.location.like(f"%{location}%"))
+            query = query.filter(func.lower(HotelsOrm.location).like(f"%{location.strip().lower()}%"))
             # query = query.filter(HotelsOrm.location.contains(location))
         query = (
             query
