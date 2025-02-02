@@ -29,22 +29,20 @@ async def get_hotels(
     async with async_session_maker() as session:
         query = select(HotelsOrm)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query 
         if title:
-            query = query.filter(func.lower(HotelsOrm.title).like(f"%{title.strip().lower()}%"))  # like - функция, которая позволяет указать шаблон для поиска (по подстроке)
-            # query = query.filter(HotelsOrm.title.contains(title))
+            query = query.filter(func.lower(HotelsOrm.title).contains(title.strip().lower()))  # contains - функция, которая позволяет указать шаблон для поиска (по подстроке)
         if location:
-            query = query.filter(func.lower(HotelsOrm.location).like(f"%{location.strip().lower()}%"))
-            # query = query.filter(HotelsOrm.location.contains(location))
+            query = query.filter(func.lower(HotelsOrm.location).contains(location.strip().lower()))
         query = (
             query
             .limit(per_page)
             .offset(per_page * (pagination.page - 1))  # все что выше (с if и дальше) - пагинация с опциональной фильтрацией
         )
             
-         # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query
+        # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query
+        # print(query.compile(compile_kwargs={"literal_binds": True}))  # Принт в консоль для дебага (или можно в database.py у объекта engine приписать параметр echo=True)
         result = await session.execute(query)
 
-        hotels = result.scalars().all()
-        # print(type(hotels), hotels)  # Принт в консоль для дебага (или можно в database.py у объекта engine приписать параметр echo=True)
+        hotels = result.scalars().all() 
         return hotels
         # commit() не нужно вызывать в select, т.к. commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
 
