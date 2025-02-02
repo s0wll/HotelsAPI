@@ -1,6 +1,8 @@
 from fastapi import Query, APIRouter, Body
 
 from sqlalchemy import insert, select
+from sqlalchemy.sql.operators import like_op
+
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
 from models.hotels import HotelsOrm
@@ -20,18 +22,19 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция 
 )
 async def get_hotels(
         pagination: PaginationDep,  # Параметры для пагинации
-        id: int | None = Query(None, description="Айдишник"),  # id - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
-                                                  # int | None - означает, что параметр необязателен к заполнению в FastAPI
         title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # str | None - означает, что параметр необязателен к заполнению в FastAPI
+        location: str | None = Query(None, description="Адрес отеля"),
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        query = select(HotelsOrm)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query
-        if id:
-            query = query.filter_by(id=id) 
+        query = select(HotelsOrm)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query 
         if title:
-            query = query.filter_by(title=title)
+            # query = query.filter(like_op(HotelsOrm.title, '{title}%'))  
+            query = query.filter(HotelsOrm.title.contains(title))
+        if location:
+            # query = query.filter(like_op(HotelsOrm.location, '{title}%'))
+            query = query.filter(HotelsOrm.location.contains(location))
         query = (
             query
             .limit(per_page)
@@ -47,13 +50,6 @@ async def get_hotels(
         # commit() не нужно вызывать в select, т.к. commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
 
 
-
-    # if pagination.page and pagination.per_page:  # if page и per_page переданы
-        # return hotels_[pagination.per_page * (pagination.page - 1):][:pagination.per_page]  # Решение учителя
-        #return hotels_[per_page * (page - 1):per_page * page] # Я решил так
-
-
-
 '''Создание POST ручки на добавление отелей'''
 @router.post(
         "",
@@ -62,11 +58,11 @@ async def get_hotels(
 )
 async def create_hotel(hotel_data: Hotel = Body(openapi_examples={  # # Использование в качестве параметров атрибуты из класса Hotel
     "1": {"summary": "Сочи", "value": {
-        "title": "Отель Сочи 5 звезд у моря",
-        "location": "ул. Моря, 1",
+        "title": "Отель Elite Resort 5 звезд у моря",
+        "location": "Сочи, ул. Моря, 1",
     }}, "2": {"summary": "Дубай", "value": {
-        "title": "Отель Дубай у фонтана",
-        "location": "ул. Шейха, 2",
+        "title": "Отель Sheikh Resort у фонтана",
+        "location": "Дубай, ул. Шейха, 2",
     }}, 
 })
 ):  
