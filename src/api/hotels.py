@@ -1,7 +1,6 @@
 from fastapi import Query, APIRouter, Body
 
 from sqlalchemy import insert, select
-from sqlalchemy.sql.operators import like_op
 
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
@@ -24,17 +23,17 @@ async def get_hotels(
         pagination: PaginationDep,  # Параметры для пагинации
         title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # str | None - означает, что параметр необязателен к заполнению в FastAPI
-        location: str | None = Query(None, description="Адрес отеля"),
+        location: str | None = Query(None, description="Локация"),
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
         query = select(HotelsOrm)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query 
         if title:
-            # query = query.filter(like_op(HotelsOrm.title, '{title}%'))  
-            query = query.filter(HotelsOrm.title.contains(title))
+            query = query.filter(HotelsOrm.title.like(f"%{title}%"))  # like - функция, которая позволяет указать шаблон для поиска (по подстроке)
+            # query = query.filter(HotelsOrm.title.contains(title))
         if location:
-            # query = query.filter(like_op(HotelsOrm.location, '{title}%'))
-            query = query.filter(HotelsOrm.location.contains(location))
+            query = query.filter(HotelsOrm.location.like(f"%{location}%"))
+            # query = query.filter(HotelsOrm.location.contains(location))
         query = (
             query
             .limit(per_page)
