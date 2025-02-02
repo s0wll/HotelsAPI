@@ -19,14 +19,26 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция 
         description="Тут можно получить определенный отель или все отели",
 )
 async def get_hotels(
-    pagination: PaginationDep,
-    id: int | None = Query(None, description="Айдишник"),  # id - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
-                                              # int | None - означает, что параметр необязателен к заполнению в FastAPI
-    title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
+        pagination: PaginationDep,  # Параметры для пагинации
+        id: int | None = Query(None, description="Айдишник"),  # id - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
+                                                  # int | None - означает, что параметр необязателен к заполнению в FastAPI
+        title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # str | None - означает, что параметр необязателен к заполнению в FastAPI
 ):
+    per_page = pagination.per_page or 5
     async with async_session_maker() as session:
         query = select(HotelsOrm)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query
+        if id:
+            query = query.filter_by(id=id) 
+        if title:
+            query = query.filter_by(title=title)
+        query = (
+            query
+            .limit(per_page)
+            .offset(per_page * (pagination.page - 1))  # все что выше (с if и дальше) - пагинация с опциональной фильтрацией
+        )
+            
+         # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query
         result = await session.execute(query)
 
         hotels = result.scalars().all()
@@ -43,7 +55,6 @@ async def get_hotels(
 
 
 '''Создание POST ручки на добавление отелей'''
-# body, request body
 @router.post(
         "",
         summary="Добавление отеля",
