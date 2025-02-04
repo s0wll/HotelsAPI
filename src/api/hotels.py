@@ -67,14 +67,13 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={  # # Испо
         summary="Полное изменение отеля",
         description="Тут мы полностью обновляем данные об отеле",
 )
-def edit_hotel(
+async def edit_hotel(
     hotel_id: int,  # Параметр пути Path() (т.к. в пути app.put мы указали hotel_id, то в параметрах основной функции это будет именно Path() параметр)
     hotel_data: Hotel,  # Использование в качестве параметров атрибуты из класса Hotel
 ):
-    global hotels
-    hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
-    hotel["title"] = hotel_data.title
-    hotel["name"] = hotel_data.name
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data, id=hotel_id)
+        await session.commit()
     return {"status": "OK"}
 
 
@@ -103,7 +102,8 @@ def partially_edit_hotel(
         summary="Удаление отеля",
         description="Тут можно удалить определенный отель",
 )
-def delete_hotel(hotel_id: int):
-    global hotels
-    hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
-    return {"status": "OK"}
+async def delete_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).delete(id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}   
