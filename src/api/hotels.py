@@ -1,3 +1,4 @@
+# API ручки (endpoints)
 from fastapi import Query, APIRouter, Body
 
 from sqlalchemy import insert, select, func  # func общий метод для использования любых функций, которые есть в БД

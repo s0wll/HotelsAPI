@@ -1,3 +1,4 @@
+# Файл с зависимостями
 from typing import Annotated
 
 from fastapi import Depends, Query

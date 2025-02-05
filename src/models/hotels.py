@@ -1,3 +1,4 @@
+# Создание модели sqlalchemy (в БД это таблица)
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
 

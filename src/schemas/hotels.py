@@ -1,3 +1,4 @@
+# Схема для данных для hotels
 from pydantic import BaseModel, Field, ConfigDict
 
 class HotelAdd(BaseModel):  # Класс Hotel для удобного использования данных в коде (принцип dry). BaseModel - класс библиотеки Pydantic
