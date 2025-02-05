@@ -1,4 +1,4 @@
-# API ручки (endpoints)
+# API ручки для /hotels(endpoints)
 from fastapi import Query, APIRouter, Body
 
 from sqlalchemy import insert, select, func  # func общий метод для использования любых функций, которые есть в БД
@@ -6,7 +6,7 @@ from sqlalchemy import insert, select, func  # func общий метод для
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
 from models.hotels import HotelsOrm
-from repositories.hotels import HotelsRepository
+from src.repositories.hotels import HotelsRepository
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
 from src.schemas.hotels import Hotel, HotelAdd, HotelPATCH
