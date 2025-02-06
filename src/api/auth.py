@@ -9,7 +9,7 @@ from schemas.users import UserRequestAdd, UserAdd
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
-
+ 
 @router.post("/register")
 async def register_user(
         data: UserRequestAdd,
