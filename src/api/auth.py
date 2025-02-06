@@ -1,6 +1,7 @@
 # API ручки для /users(endpoints)
-from fastapi import APIRouter, HTTPException, Response, Request
+from fastapi import APIRouter, HTTPException, Response
 
+from src.api.dependencies import UserIdDep
 from src.services.auth import AuthService
 from src.repositories.users import UsersRepository
 from src.database import async_session_maker
@@ -31,7 +32,7 @@ async def login_user(
     async with async_session_maker() as session: 
         user = await UsersRepository(session).get_user_with_hashed_password(email=data.email)
         if not user:
-            raise HTTPException(status_code=401, detail="Пользватель с таким email не зарегестрирован")
+            raise HTTPException(status_code=401, detail="Польозватель с таким email не зарегестрирован")
         if not AuthService().verify_password(data.password, user.hashed_password):
             raise HTTPException(status_code=401, detail="Пароль неверный")
         access_token = AuthService().create_access_token({"user_id": user.id})
@@ -39,13 +40,10 @@ async def login_user(
         return {"access_token": access_token}
     
 
-@router.get("/only_auth")  # Ручка на получение токена пользователя, декодировку токена для получения данных пользователя
-async def only_auth(
-    request: Request, 
+@router.get("/me")  # Ручка на получение данных аутентифицированного пользователя (id)
+async def get_me(
+    user_id: UserIdDep,
 ):
-    access_token = request.cookies.get("access_token", None)
-    data = AuthService().decode_token(access_token)
-    user_id = data["user_id"]
     async with async_session_maker() as session:
         user = await UsersRepository(session).get_one_or_none(id=user_id)
         return user
