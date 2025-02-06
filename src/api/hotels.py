@@ -1,7 +1,7 @@
 # API ручки для /hotels(endpoints)
 from fastapi import Query, APIRouter, Body
 
-from sqlalchemy import insert, select, func  # func общий метод для использования любых функций, которые есть в БД
+from sqlalchemy import insert, select, func  
 
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
@@ -55,7 +55,8 @@ async def create_hotel(hotel_data: HotelAdd = Body(openapi_examples={  # # Ис�
     "1": {"summary": "Сочи", "value": {
         "title": "Отель Elite Resort 5 звезд у моря",
         "location": "Сочи, ул. Моря, 1",
-    }}, "2": {"summary": "Дубай", "value": {
+    }}, 
+    "2": {"summary": "Дубай", "value": {
         "title": "Отель Sheikh Resort у фонтана",
         "location": "Дубай, ул. Шейха, 2",
     }}, 

@@ -1,8 +1,8 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func # func общий метод для использования любых функций, которые есть в БД
 
 from src.repositories.base import BaseRepository
 from models.hotels import HotelsOrm
-from schemas.hotels import Hotel
+from src.schemas.hotels import Hotel
 
 
 class HotelsRepository(BaseRepository):
