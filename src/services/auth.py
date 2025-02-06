@@ -21,3 +21,6 @@ class AuthService:
     
     def verify_password(self, plain_password, hashed_password):
         return self.pwd_context.verify(plain_password, hashed_password)
+    
+    def decode_token(self, token: str) -> dict:  # Ф-я декодирования JWT токена для получения данных пользователя
+        return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
