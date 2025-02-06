@@ -1,5 +1,5 @@
 # API ручки для /users(endpoints)
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Request
 
 from src.services.auth import AuthService
 from src.repositories.users import UsersRepository
@@ -26,7 +26,7 @@ async def register_user(
 @router.post("/login")
 async def login_user(
     data: UserRequestAdd,
-    response: Response
+    response: Response,
 ):
     async with async_session_maker() as session: 
         user = await UsersRepository(session).get_user_with_hashed_password(email=data.email)
@@ -38,3 +38,10 @@ async def login_user(
         response.set_cookie("access_token", access_token)
         return {"access_token": access_token}
     
+
+@router.get("/only_auth")  # Ручка на получение токена пользователя для работы с параметрами авторизации данного пользователя
+async def only_auth(
+    request: Request,
+):
+    access_token = request.cookies.get("access_token", None)
+    return {"access_token": access_token}
