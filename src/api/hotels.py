@@ -1,15 +1,11 @@
 # API ручки для /hotels(endpoints)
-from fastapi import Query, APIRouter, Body
-
-from sqlalchemy import insert, select, func  
-
+from fastapi import APIRouter, Body, Query
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
-from models.hotels import HotelsOrm
 from src.repositories.hotels import HotelsRepository
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
-from src.schemas.hotels import Hotel, HotelAdd, HotelPATCH
+from src.schemas.hotels import HotelAdd, HotelPATCH
 
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция роутер для подключения ручек hotels к приложению

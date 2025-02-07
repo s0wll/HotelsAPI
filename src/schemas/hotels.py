@@ -1,5 +1,5 @@
-# Схема для данных для hotels
-from pydantic import BaseModel, Field, ConfigDict
+# Pydantic Схема для данных для hotels
+from pydantic import BaseModel, ConfigDict
 
 class HotelAdd(BaseModel):  # Класс Hotel для удобного использования данных в коде (принцип dry). BaseModel - класс библиотеки Pydantic
     title: str
@@ -11,5 +11,5 @@ class Hotel(HotelAdd):
     model_config = ConfigDict(from_attributes=True)
 
 class HotelPATCH(BaseModel):
-    title: str | None = Field(None)
-    location: str | None = Field(None) 
+    title: str | None = None
+    location: str | None = None

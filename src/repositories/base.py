@@ -10,10 +10,13 @@ class BaseRepository:
     def __init__(self, session):
         self.session = session
 
-    async def get_all(self, *args, **kwargs):
-        query = select(self.model)  # stmt (statement - выражение) используется для всего кроме select, т.к. select - запрос на выборку данных, который возвращает результат, поэтому нужно называть query 
+    async def get_filtered(self, **filter_by):
+        query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
         return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+
+    async def get_all(self, *args, **kwargs):
+        return await self.get_filtered()  # Вызываем гет филтред без указания параметров фильтрации, поэтому получаем all
 
     async def get_one_or_none(self, **filter_by):
         query = select(self.model).filter_by(**filter_by)
@@ -22,7 +25,6 @@ class BaseRepository:
         if model is None:
             return None
         return self.schema.model_validate(model, from_attributes=True)
-
     
     async def add(self, data: BaseModel):
         add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
