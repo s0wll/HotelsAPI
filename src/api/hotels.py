@@ -2,9 +2,7 @@
 from fastapi import APIRouter, Body, Query
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
-from src.repositories.hotels import HotelsRepository
-from src.api.dependencies import PaginationDep
-from src.database import async_session_maker
+from src.api.dependencies import PaginationDep, DBDep
 from src.schemas.hotels import HotelAdd, HotelPATCH
 
 
@@ -19,26 +17,25 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция 
 )
 async def get_hotels(
         pagination: PaginationDep,  # Параметры для пагинации
+        db: DBDep,
         title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # str | None - означает, что параметр необязателен к заполнению в FastAPI
         location: str | None = Query(None, description="Локация"),
 ):
     per_page = pagination.per_page or 5
-    async with async_session_maker() as session:
-        return await HotelsRepository(session).get_all(
-            title=title, 
-            location=location, 
-            limit=per_page, 
-            offset=per_page * (pagination.page - 1),
-        )
+    return await db.hotels.get_all(
+        title=title, 
+        location=location, 
+        limit=per_page, 
+        offset=per_page * (pagination.page - 1),
+    )
         # commit() не нужно вызывать в select, т.к. commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
 
 
 '''Ручка на получение одного отеля'''
 @router.get("/{hotel_id}")
-async def get_hotel(hotel_id: int):
-    async with async_session_maker() as session:
-        return await HotelsRepository(session).get_one_or_none(id=hotel_id)
+async def get_hotel(hotel_id: int, db: DBDep):
+    return await db.hotels.get_one_or_none(id=hotel_id)
 
 
 '''Создание POST ручки на добавление отелей'''
@@ -47,7 +44,7 @@ async def get_hotel(hotel_id: int):
         summary="Добавление отеля",
         description="Тут можно добавить новый отель",
 )
-async def create_hotel(hotel_data: HotelAdd = Body(openapi_examples={  # # Использование в качестве параметров атрибуты из класса Hotel
+async def create_hotel(db: DBDep, hotel_data: HotelAdd = Body(openapi_examples={  # # Использование в качестве параметров атрибуты из класса Hotel
     "1": {"summary": "Сочи", "value": {
         "title": "Отель Elite Resort 5 звезд у моря",
         "location": "Сочи, ул. Моря, 1",
@@ -58,11 +55,9 @@ async def create_hotel(hotel_data: HotelAdd = Body(openapi_examples={  # # Ис�
     }}, 
 })
 ):  
-    async with async_session_maker() as session:  # Сессия (транзакция в БД) для отправления запроса в БД
-        hotel = await HotelsRepository(session).add(hotel_data)
-        # print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))  # Вывод SQL запроса в консоль для дебага (делается только на этапе разработки для себя)
-        await session.commit()  # commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
-
+    hotel = await db.hotels.add(hotel_data)
+    await db.commit()
+    # print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))  # Вывод SQL запроса в консоль для дебага (делается только на этапе разработки для себя)
     return {"status": "OK", "data": hotel}
 
 
@@ -75,10 +70,10 @@ async def create_hotel(hotel_data: HotelAdd = Body(openapi_examples={  # # Ис�
 async def edit_hotel(
     hotel_id: int,  # Параметр пути Path() (т.к. в пути app.put мы указали hotel_id, то в параметрах основной функции это будет именно Path() параметр)
     hotel_data: HotelAdd,  # Использование в качестве параметров атрибуты из класса Hotel
+    db: DBDep,
 ):
-    async with async_session_maker() as session:
-        await HotelsRepository(session).edit(hotel_data, id=hotel_id)
-        await session.commit()
+    await db.hotels.edit(hotel_data, id=hotel_id)
+    await db.commit()
     return {"status": "OK"}
 
 
@@ -91,10 +86,10 @@ async def edit_hotel(
 async def partially_edit_hotel(
     hotel_id: int,
     hotel_data: HotelPATCH,
+    db: DBDep,
 ):
-    async with async_session_maker() as session:
-        await HotelsRepository(session).edit(hotel_data, exclude_unset=True, id=hotel_id)
-        await session.commit()
+    await db.hotels.edit(hotel_data, exclude_unset=True, id=hotel_id)
+    await db.commit()
     return {"status": "OK"}
 
 
@@ -104,8 +99,7 @@ async def partially_edit_hotel(
         summary="Удаление отеля",
         description="Тут можно удалить определенный отель",
 )
-async def delete_hotel(hotel_id: int):
-    async with async_session_maker() as session:
-        await HotelsRepository(session).delete(id=hotel_id)
-        await session.commit()
+async def delete_hotel(hotel_id: int, db: DBDep):
+    await db.hotels.delete(id=hotel_id)
+    await db.commit()
     return {"status": "OK"}   

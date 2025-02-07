@@ -5,6 +5,8 @@ from fastapi import Depends, Query, HTTPException, Request
 from pydantic import BaseModel
 
 from services.auth import AuthService
+from src.utils.db_manager import DBManager
+from src.database import async_session_maker
 
 
 class PaginationParams(BaseModel):  # 1 - дефолт значение у переменной (deafult: 1). Для per_page дефолт None, но в запросе в БД либо пользователь передает, либо будет дефолт 5
@@ -29,3 +31,17 @@ def get_current_user_id(token: str = Depends(get_token)) -> int:  # Ф-я пол
 
 
 UserIdDep = Annotated[int, Depends(get_current_user_id)]
+
+
+
+
+def get_db_manager():  # Получение дб менеджера
+    return DBManager(session_factory=async_session_maker)  # Сессия (транзакция в БД) для отправления запроса в БД
+
+
+async def get_db():  # Генератор, который открывает контекстный дб менеджер и отдавать сущность дб менеджера
+    async with get_db_manager() as db:
+        yield db
+
+
+DBDep = Annotated[DBManager, Depends(get_db)]
