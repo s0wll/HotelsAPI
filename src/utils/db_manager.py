@@ -23,4 +23,4 @@ class DBManager:
         await self.session.close()
 
     async def commit(self):
-        await self.session.commit()
+        await self.session.commit()  # # commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
