@@ -8,7 +8,7 @@ from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPat
 router = APIRouter(prefix="/hotels", tags=["Номера"])
 
 
-@router.get("/{hotel_id}/rooms")
+@router.get("/{hotel_id}/rooms")  # Ручка на получение доступных для брони номеров в отеле
 async def get_rooms(
         hotel_id: int, 
         db: DBDep,

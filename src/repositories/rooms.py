@@ -5,7 +5,7 @@ from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
 from src.schemas.rooms import Room
 
-from src.database import engine
+# from src.database import engine  # Импорт движка для дбага запроса
 from src.models.bookings import BookingsOrm
 
 
@@ -14,6 +14,7 @@ class RoomsRepository(BaseRepository):
     model = RoomsOrm
     schema = Room
 
+    # Ф-я для получения доступных для брони номеров в определенном отеле
     async def get_filtered_by_time(
             self,
             hotel_id: int,
@@ -32,7 +33,7 @@ class RoomsRepository(BaseRepository):
 	        left join rooms_count on rooms.id = rooms_count.room_id
         )
         select * from rooms_left_table
-        where rooms_left > 0
+        where rooms_left > 0 and room_id in (select id from rooms where hotel_id = 11)
         ;
         """
         """Реализация этого запроса:"""
@@ -60,7 +61,7 @@ class RoomsRepository(BaseRepository):
         """
         rooms_left_table = (
             select(
-                RoomsOrm.id.label("rooms_id"), 
+                RoomsOrm.id.label("room_id"), 
                 (RoomsOrm.quantity - func.coalesce(rooms_count.c.rooms_booked, 0)).label("rooms_left")
             )
             .select_from(RoomsOrm)
@@ -71,12 +72,26 @@ class RoomsRepository(BaseRepository):
 
         """Третий запрос для выборки
         select * from rooms_left_table
-        where rooms_left > 0
+        where rooms_left > 0 and room_id in (select id from rooms where hotel_id = 11)
         """
-        query = (
-            select(rooms_left_table)
-            .select_from(rooms_left_table)
-            .filter(rooms_left_table.c.rooms_left > 0)
+
+        # (select id from rooms where hotel_id = 11)
+        rooms_ids_for_hotel = (
+            select(RoomsOrm.id)
+            .select_from(RoomsOrm)
+            .filter_by(hotel_id=hotel_id)
+            .subquery(name="rooms_ids_for_hotel")
         )
 
-        print(query.compile(bind=engine, compile_kwargs={"literal_binds": True}))  # Вывод запроса в консоль для дебага
+        rooms_ids_to_get = (
+            select(rooms_left_table.c.room_id)
+            .select_from(rooms_left_table)
+            .filter(
+                rooms_left_table.c.rooms_left > 0,
+                rooms_left_table.c.room_id.in_(rooms_ids_for_hotel),
+                # (select id from rooms where hotel_id = 11)
+            )
+        )
+
+        # print(rooms_ids_to_get.compile(bind=engine, compile_kwargs={"literal_binds": True}))  # Вывод запроса в консоль для дебага
+        return await self.get_filtered(RoomsOrm.id.in_(rooms_ids_to_get))
