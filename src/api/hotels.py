@@ -1,4 +1,5 @@
 # API ручки для /hotels(endpoints)
+from datetime import date
 from fastapi import APIRouter, Body, Query
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
@@ -21,13 +22,17 @@ async def get_hotels(
         title: str | None = Query(None, description="Название отеля"),  # title - параметр, который будет передаваться в URL, Query - декоратор, который позволяет указать описание параметра (название)
                                               # str | None - означает, что параметр необязателен к заполнению в FastAPI
         location: str | None = Query(None, description="Локация"),
+        date_from: date = Query(example="2025-02-07"),
+        date_to: date = Query(example="2025-02-09"),
 ):
     per_page = pagination.per_page or 5
-    return await db.hotels.get_all(
-        title=title, 
-        location=location, 
+    return await db.hotels.get_filtered_by_time(
+        date_from=date_from,
+        date_to=date_to,
+        title=title,
+        location=location,
         limit=per_page, 
-        offset=per_page * (pagination.page - 1),
+        offset=per_page * (pagination.page - 1)
     )
         # commit() не нужно вызывать в select, т.к. commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
 
