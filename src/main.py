@@ -10,6 +10,7 @@ from src.api.auth import router as router_auth  # Импорт роутера au
 from src.api.hotels import router as router_hotels  # Импорт роутера hotels
 from src.api.rooms import router as router_rooms  # Импорт роутера rooms
 from src.api.bookings import router as router_bookings  # Импорт роутера bookings
+from src.api.facilities import router as router_facilities
 
 
 app = FastAPI()  # Приложение - объект класса FastAPI
@@ -17,6 +18,7 @@ app = FastAPI()  # Приложение - объект класса FastAPI
 app.include_router(router_auth)
 app.include_router(router_hotels)  # Подключение роутера hotels к приложению
 app.include_router(router_rooms)
+app.include_router(router_facilities)
 app.include_router(router_bookings)
 
 
