@@ -3,6 +3,7 @@ from fastapi import APIRouter, Body, Query
 
 from src.api.dependencies import DBDep
 from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
+from src.schemas.facilities import RoomFacilityAdd
 
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
@@ -28,20 +29,25 @@ async def create_room(db: DBDep, hotel_id: int, room_data: RoomAddRequest = Body
     openapi_examples={
         "1": {"summary": "Эконом", "value": {
             "title": "Эконом номер",
-            "description": "Односпальный номер без кондиционера",
+            "description": "Односпальный номер",
             "price": 1000,
             "quantity": 5,
+            "facilities_ids": [1, 2],
         }},
         "2": {"summary": "Люкс", "value": {
             "title": "Люкс номер",
-            "description": "Двуспальный номер с кондиционером и телеком",
+            "description": "Двуспальный номер",
             "price": 4000,
             "quantity": 2,
+            "facilities_ids": [1, 2],
         }},
 }
 )):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add(_room_data)
+
+    rooms_facilities_data = [RoomFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
+    await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
     return {"status": "OK", "data": room}
 
@@ -52,7 +58,7 @@ async def edit_room(
         room_id: int, 
         room_data: RoomAddRequest, 
         db: DBDep,
-):
+):  
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     await db.rooms.edit(_room_data, id=room_id)
     await db.commit()

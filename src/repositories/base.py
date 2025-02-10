@@ -1,7 +1,7 @@
 # Базовый репозиторий
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
-from src.database import engine
+# from src.database import engine
 
 class BaseRepository:
     model = None
@@ -17,12 +17,8 @@ class BaseRepository:
             .filter_by(**filter_by)
         )
         result = await self.session.execute(query)
-        _result = result.scalars().all()
-        print(query.compile(engine, compile_kwargs={"literal_binds": True}))
-        if _result:
-            #return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
-            return _result
-        return None
+        return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+
 
     async def get_all(self, *args, **kwargs):
         print(self.schema, self.model)
@@ -40,8 +36,14 @@ class BaseRepository:
         add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
-        print(add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
         return self.schema.model_validate(model, from_attributes=True)
+    
+
+    async def add_bulk(self, data: list[BaseModel]):
+        add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
+        await self.session.execute(add_data_stmt)
+        
+
 
     async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by) -> None:
         update_stmt = (
