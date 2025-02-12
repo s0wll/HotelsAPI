@@ -15,7 +15,7 @@ class RoomsOrm(Base):
     price: Mapped[int]
     quantity: Mapped[int]  # Кол-во таких номеров в отеле
 
-    facilities: Mapped[list["FacilitiesOrm"]] = relationship( # type: ignore
+    facilities: Mapped[list["FacilitiesOrm"]] = relationship( # Relationship аттрибут для получения данных из взаимосвязанных таблиц # type: ignore
         back_populates="rooms",
         secondary="rooms_facilities",
     )

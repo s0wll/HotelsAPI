@@ -10,7 +10,7 @@ class FacilitiesOrm(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(100))
 
-    rooms: Mapped[list["RoomsOrm"]] = relationship( # type: ignore
+    rooms: Mapped[list["RoomsOrm"]] = relationship( # Relationship аттрибут для получения данных из взаимосвязанных таблиц # type: ignore
         back_populates="facilities",
         secondary="rooms_facilities",
     )
