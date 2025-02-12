@@ -32,14 +32,14 @@ async def create_room(db: DBDep, hotel_id: int, room_data: RoomAddRequest = Body
             "description": "Односпальный номер",
             "price": 1000,
             "quantity": 5,
-            "facilities_ids": [1, 2],
+            "facilities_ids": [1],
         }},
         "2": {"summary": "Люкс", "value": {
             "title": "Люкс номер",
             "description": "Двуспальный номер",
             "price": 4000,
             "quantity": 2,
-            "facilities_ids": [1, 2],
+            "facilities_ids": [1, 2, 3],
         }},
 }
 )):
