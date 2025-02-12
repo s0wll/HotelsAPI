@@ -23,7 +23,6 @@ class BaseRepository:
 
 
     async def get_all(self, *args, **kwargs):
-        print(self.schema, self.model)
         return await self.get_filtered()  # Вызываем гет филтред без указания параметров фильтрации, поэтому получаем all
 
     async def get_one_or_none(self, **filter_by):
