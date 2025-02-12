@@ -34,6 +34,7 @@ PyJWT==2.10.1
 python-dotenv==1.0.1
 python-multipart==0.0.20
 PyYAML==6.0.2
+redis==5.2.1
 rich==13.9.4
 rich-toolkit==0.13.2
 shellingham==1.5.4
@@ -42,6 +43,7 @@ SQLAlchemy==2.0.37
 starlette==0.45.3
 typer==0.15.1
 typing_extensions==4.12.2
+tzdata==2025.1
 uvicorn==0.34.0
 uvloop==0.21.0
 watchfiles==1.0.4
