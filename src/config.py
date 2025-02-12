@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     DB_PASS: str
     DB_NAME: str
 
+    REDIS_HOST: str
+    REDIS_PORT: int
+
     # DSN - стандартный синтаксис адреса для подключения к базе данных
     @property
     def DB_URL(self):
