@@ -1,6 +1,7 @@
 # API ручки для /hotels(endpoints)
 from datetime import date
 from fastapi import APIRouter, Body, Query
+from fastapi_cache.decorator import cache
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
 from src.api.dependencies import PaginationDep, DBDep
@@ -16,6 +17,7 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция 
         summary="Получение отеля",
         description="Тут можно получить определенный отель или все отели",
 )
+@cache(expire=10)
 async def get_hotels(
         pagination: PaginationDep,  # Параметры для пагинации
         db: DBDep,
@@ -25,6 +27,7 @@ async def get_hotels(
         date_from: date = Query(example="2025-02-07"),
         date_to: date = Query(example="2025-02-09"),
 ):
+    print("иду в бд")
     per_page = pagination.per_page or 5
     return await db.hotels.get_filtered_by_time(
         date_from=date_from,
@@ -39,6 +42,7 @@ async def get_hotels(
 
 '''Ручка на получение одного отеля'''
 @router.get("/{hotel_id}")
+@cache(expire=10)
 async def get_hotel(hotel_id: int, db: DBDep):
     return await db.hotels.get_one_or_none(id=hotel_id)
 
