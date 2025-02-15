@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from src.repositories.utils import rooms_ids_for_booking
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
-from repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
+from src.repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
 
 
 class RoomsRepository(BaseRepository):
