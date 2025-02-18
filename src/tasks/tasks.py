@@ -15,7 +15,7 @@ def test_task():
     print("я молодец")
 
 
-# @celery_instance.task  # Celery Task
+@celery_instance.task  # Celery Task
 def resize_image(image_path: str):
     sizes = [1000, 500, 200]
     output_folder = 'src/static/images'
