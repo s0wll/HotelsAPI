@@ -4,14 +4,17 @@
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine  # 1 - класс для создания сессии (отправление транзакции), 2 - Асинхронный движок
 from sqlalchemy.orm import DeclarativeBase  # Библиотека алхимии ОРМ (для работы с БД через код)
+from sqlalchemy import NullPool
 
 from src.config import settings
 
 
 engine = create_async_engine(settings.DB_URL)
+engine_null_pool = create_async_engine(settings.DB_URL, poolclass=NullPool)
 
 async_session_maker = async_sessionmaker(bind=engine, expire_on_commit=False)  # Для создания сессии (отправление транзакции).
                                                                                # Объект сессии (которые мы будем создавать) - своего рода транзакция в базу данных
+async_session_maker_null_pool = async_sessionmaker(bind=engine_null_pool, expire_on_commit=False)
 
 class Base(DeclarativeBase):  # Создаем класс, который ничего не делает. Он нужен, чтобы мы наследовали от него все модели в проекте
     pass

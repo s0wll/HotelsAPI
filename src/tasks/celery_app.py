@@ -9,3 +9,11 @@ celery_instance = Celery(
         "src.tasks.tasks",
     ],
 )
+
+celery_instance.conf.beat_schedule = {
+    "luboe-nazvanie": {
+        "task": "booking_today_checkin",
+        "schedule": 5,  # Установка когда будет запускаться периодическая задача (через crontab можно указывать время)
+    }
+
+}
