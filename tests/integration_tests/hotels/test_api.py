@@ -1,5 +1,3 @@
-
-
 async def test_get_hotels(ac):
     response = await ac.get(
         "/hotels",
@@ -9,3 +7,4 @@ async def test_get_hotels(ac):
         }
     )
     assert response.status_code == 200
+    assert isinstance(response.json(), list)
