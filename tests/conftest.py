@@ -24,22 +24,20 @@ async def setup_database(check_test_mode):
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
-    with open("tests/mock_hotels.json") as file:
-        hotels_data = json.load(file)
-        for hotel in hotels_data:
-            hotel_data = HotelAdd(**hotel)
-            async with DBManager(session_factory=async_session_maker_null_pool) as db:
-                await db.hotels.add(hotel_data)
-                await db.commit()
+    with open("tests/mock_hotels.json", encoding="utf-8") as file_hotels:
+        hotels_json_data = json.load(file_hotels)
+    with open("tests/mock_rooms.json", encoding="utf-8") as file_rooms:
+        rooms_json_data = json.load(file_rooms)
 
-    with open("tests/mock_rooms.json") as file:
-        rooms_data = json.load(file)
-        for room in rooms_data:
-            room_data = RoomAdd(**room)
-            async with DBManager(session_factory=async_session_maker_null_pool) as db:
-                await db.rooms.add(room_data)
-                await db.commit()
-    
+    hotels_data = [HotelAdd.model_validate(hotel_json_data) for hotel_json_data in hotels_json_data]   
+    rooms_data = [RoomAdd.model_validate(room_json_data) for room_json_data in rooms_json_data]
+
+    async with DBManager(session_factory=async_session_maker_null_pool) as db:
+        await db.hotels.add_bulk(hotels_data)
+        await db.rooms.add_bulk(rooms_data)
+        await db.commit()
+
+
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(setup_database):
