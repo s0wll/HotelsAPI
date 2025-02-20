@@ -1,4 +1,8 @@
 import json
+from unittest import mock
+
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()  # мок для редис кэша, чтобы при тестировании не было ошибок с внешним redis cache
+
 import pytest
 from httpx import AsyncClient
 

@@ -17,7 +17,7 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])  # Концепция 
         summary="Получение отеля",
         description="Тут можно получить определенный отель или все отели",
 )
-# @cache(expire=10)
+@cache(expire=10)
 async def get_hotels(
         pagination: PaginationDep,  # Параметры для пагинации
         db: DBDep,
