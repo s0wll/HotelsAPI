@@ -27,6 +27,7 @@ async def add_booking(
     booking_data: BookingAddRequest = Body(),
 ):
     room_data = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    hotel_data = await db.hotels.get_one_or_none(id=room_data.hotel_id)
     room_price: int = room_data.price
 
     _booking_data = BookingAdd(
@@ -35,6 +36,6 @@ async def add_booking(
         **booking_data.model_dump(),
     )
 
-    booking = await db.bookings.add(_booking_data)
+    booking = await db.bookings.add_booking(_booking_data, hotel_id=hotel_data.id)
     await db.commit()
     return {"status": "OK", "data": booking}
