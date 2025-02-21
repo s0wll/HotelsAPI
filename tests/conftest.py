@@ -28,6 +28,12 @@ async def db() -> DBManager:  # type: ignore
         yield db
 
 
+@pytest.fixture(scope="module")
+async def db_module() -> DBManager:  # type: ignore
+    async with DBManager(session_factory=async_session_maker) as db_module:
+        yield db_module
+
+
 @pytest.fixture(scope="session", autouse=True)
 async def setup_database(check_test_mode):
     async with engine.begin() as conn:
