@@ -1,15 +1,35 @@
-async def test_post_booking(db, authentificated_ac):
-    room_id = (await db.rooms.get_all())[0].id
+import pytest
+
+
+@pytest.mark.parametrize("room_id, date_from, date_to, status_code", [
+    (1, "2025-01-01", "2025-01-10", 200),
+    (1, "2025-01-02", "2025-01-11", 200),
+    (1, "2025-01-03", "2025-01-12", 200),
+    (1, "2025-01-04", "2025-01-13", 200),
+    (1, "2025-01-05", "2025-01-14", 200),
+    (1, "2025-01-06", "2025-01-15", 500),
+    (1, "2025-01-16", "2025-01-17", 200),  # Данная дата уже не накладывается на другие
+])  # Параметризация ф-ии (по множеству входных параметров с указанием исхода выполнения кода)
+async def test_post_booking(
+    room_id, 
+    date_from,  
+    date_to, 
+    status_code,
+    db, authentificated_ac
+):
+    # room_id = (await db.rooms.get_all())[0].id
     response = await authentificated_ac.post(
         "/bookings",
         json={
             "room_id": room_id,
-            "date_from": "2025-01-01",
-            "date_to": "2025-01-02",
+            "date_from": date_from,
+            "date_to": date_to,
         }
     )
-    assert response.status_code == 200
-    res = response.json()
-    assert isinstance(res, dict)
-    assert res["status"] == "OK"
-    assert "data" in res
+    assert response.status_code == status_code
+    if status_code == 200:
+        res = response.json()
+        assert isinstance(res, dict)
+        assert res["status"] == "OK"
+        assert "data" in res
+
