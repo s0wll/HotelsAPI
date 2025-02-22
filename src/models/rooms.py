@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
 from src.database import Base
+
 if typing.TYPE_CHECKING:
     from src.models import FacilitiesOrm
 
@@ -18,7 +19,9 @@ class RoomsOrm(Base):
     price: Mapped[int]
     quantity: Mapped[int]  # Кол-во таких номеров в отеле
 
-    facilities: Mapped[list["FacilitiesOrm"]] = relationship( # Relationship аттрибут для получения данных из взаимосвязанных таблиц
-        back_populates="rooms",
-        secondary="rooms_facilities",
+    facilities: Mapped[list["FacilitiesOrm"]] = (
+        relationship(  # Relationship аттрибут для получения данных из взаимосвязанных таблиц
+            back_populates="rooms",
+            secondary="rooms_facilities",
+        )
     )

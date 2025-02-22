@@ -7,6 +7,7 @@ from src.tasks.tasks import resize_image
 
 router = APIRouter(prefix="/images", tags=["Изображения"])
 
+
 @router.post("")  # Ручка с таской Celery
 def upload_image(file: UploadFile):
     image_path = f"src/static/images/{file.filename}"
@@ -14,6 +15,7 @@ def upload_image(file: UploadFile):
         shutil.copyfileobj(file.file, new_file)
 
     resize_image.delay(image_path)
+
 
 # @router.post("")  # Ручка с таской без Celery, напрямую через FastAPI
 # def upload_image(file: UploadFile, background_tasks: BackgroundTasks):

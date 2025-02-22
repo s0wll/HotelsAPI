@@ -3,6 +3,7 @@ async def test_get_facilities(ac):
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
+
 async def test_post_facility(ac):
     facility_title = "Wi-Fi"
     response = await ac.post("/facilities", json={"title": facility_title})

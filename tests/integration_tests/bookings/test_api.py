@@ -1,22 +1,19 @@
 import pytest
 
 
-@pytest.mark.parametrize("room_id, date_from, date_to, status_code", [
-    (1, "2025-01-01", "2025-01-10", 200),
-    (1, "2025-01-02", "2025-01-11", 200),
-    (1, "2025-01-03", "2025-01-12", 200),
-    (1, "2025-01-04", "2025-01-13", 200),
-    (1, "2025-01-05", "2025-01-14", 200),
-    (1, "2025-01-06", "2025-01-15", 500),
-    (1, "2025-01-16", "2025-01-17", 200),  # Данная дата уже не накладывается на другие
-])  # Параметризация ф-ии (по множеству входных параметров с указанием исхода выполнения кода)
-async def test_post_booking(
-    room_id, 
-    date_from,  
-    date_to, 
-    status_code,
-    db, authentificated_ac
-):
+@pytest.mark.parametrize(
+    "room_id, date_from, date_to, status_code",
+    [
+        (1, "2025-01-01", "2025-01-10", 200),
+        (1, "2025-01-02", "2025-01-11", 200),
+        (1, "2025-01-03", "2025-01-12", 200),
+        (1, "2025-01-04", "2025-01-13", 200),
+        (1, "2025-01-05", "2025-01-14", 200),
+        (1, "2025-01-06", "2025-01-15", 500),
+        (1, "2025-01-16", "2025-01-17", 200),  # Данная дата уже не накладывается на другие
+    ],
+)  # Параметризация ф-ии (по множеству входных параметров с указанием исхода выполнения кода)
+async def test_post_booking(room_id, date_from, date_to, status_code, db, authentificated_ac):
     # room_id = (await db.rooms.get_all())[0].id
     response = await authentificated_ac.post(
         "/bookings",
@@ -24,7 +21,7 @@ async def test_post_booking(
             "room_id": room_id,
             "date_from": date_from,
             "date_to": date_to,
-        }
+        },
     )
     assert response.status_code == status_code
     if status_code == 200:
@@ -43,18 +40,21 @@ async def delete_all_bookings(db_module):
     assert not bookings
 
 
-@pytest.mark.parametrize("room_id, date_from, date_to, booked_rooms", [
-    (1, "2025-01-01", "2025-01-10", 1),
-    (1, "2025-01-02", "2025-01-11", 2),
-    (1, "2025-01-03", "2025-01-12", 3),
-])
+@pytest.mark.parametrize(
+    "room_id, date_from, date_to, booked_rooms",
+    [
+        (1, "2025-01-01", "2025-01-10", 1),
+        (1, "2025-01-02", "2025-01-11", 2),
+        (1, "2025-01-03", "2025-01-12", 3),
+    ],
+)
 async def test_add_and_get_my_bookings(
-    room_id, 
-    date_from,  
-    date_to, 
+    room_id,
+    date_from,
+    date_to,
     booked_rooms,
     authentificated_ac,
-    delete_all_bookings,                            
+    delete_all_bookings,
 ):
     response = await authentificated_ac.post(
         "/bookings",
@@ -62,7 +62,7 @@ async def test_add_and_get_my_bookings(
             "room_id": room_id,
             "date_from": date_from,
             "date_to": date_to,
-        }
+        },
     )
     assert response.status_code == 200
     res = response.json()
@@ -75,8 +75,3 @@ async def test_add_and_get_my_bookings(
     res = response_my_bookings.json()
     assert isinstance(res, list)
     assert len(res) == booked_rooms
-
-
-    
-
-    

@@ -8,11 +8,11 @@ from schemas.users import UserRequestAdd, UserAdd
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 
- 
+
 @router.post("/register")
 async def register_user(
-        data: UserRequestAdd,
-        db: DBDep,
+    data: UserRequestAdd,
+    db: DBDep,
 ):
     try:
         hashed_password = AuthService().hash_password(data.password)
@@ -21,7 +21,7 @@ async def register_user(
         await db.commit()
     except:  # noqa: E722
         raise HTTPException(status_code=400, detail="Пользователь с таким email уже существует")
-    
+
     return {"status": "OK"}
 
 
@@ -39,7 +39,7 @@ async def login_user(
     access_token = AuthService().create_access_token({"user_id": user.id})
     response.set_cookie("access_token", access_token)
     return {"access_token": access_token}
-    
+
 
 @router.get("/me")  # Ручка на получение данных аутентифицированного пользователя (id)
 async def get_me(
@@ -48,11 +48,11 @@ async def get_me(
 ):
     user = await db.users.get_one_or_none(id=user_id)
     return user
-    
+
 
 @router.post("/logout")
 async def logout(
-        response: Response,
+    response: Response,
 ):
     response.delete_cookie("access_token")
     return {"status": "OK"}

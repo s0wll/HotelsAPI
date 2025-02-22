@@ -15,5 +15,4 @@ celery_instance.conf.beat_schedule = {
         "task": "booking_today_checkin",
         "schedule": 5,  # Установка когда будет запускаться периодическая задача (через crontab можно указывать время)
     }
-
 }

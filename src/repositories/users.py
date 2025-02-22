@@ -6,7 +6,6 @@ from src.models.users import UsersOrm
 from src.repositories.mappers.mappers import UserDataMapper, UserWithHashedPasswordDataMapper
 
 
-
 class UsersRepository(BaseRepository):
     model = UsersOrm
     mapper = UserDataMapper
@@ -16,4 +15,3 @@ class UsersRepository(BaseRepository):
         result = await self.session.execute(query)
         model = result.scalars().one()
         return UserWithHashedPasswordDataMapper.map_to_domain_entity(model)
-    

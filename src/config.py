@@ -2,7 +2,9 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-'''Класс Settings наследует от BaseSettings и используется для управления конфигурацией приложения'''
+"""Класс Settings наследует от BaseSettings и используется для управления конфигурацией приложения"""
+
+
 class Settings(BaseSettings):
     MODE: Literal["TEST", "LOCAL", "DEV", "PROD"]
     DB_HOST: str
@@ -23,12 +25,13 @@ class Settings(BaseSettings):
     def DB_URL(self):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
-
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
-    model_config = SettingsConfigDict(env_file=".env")  # Конфигурация модели, указывающая на файл окружения
+    model_config = SettingsConfigDict(
+        env_file=".env"
+    )  # Конфигурация модели, указывающая на файл окружения
 
 
 settings = Settings()  # Создание экземпляра класса Settings для доступа к настройкам

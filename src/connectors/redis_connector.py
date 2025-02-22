@@ -1,5 +1,6 @@
 import redis.asyncio as redis
 
+
 class RedisConnector:  # Класс с ф-ями для подключения асинхронного редиса
     def __init__(self, host: str, port: int):
         self.host = host

@@ -2,7 +2,9 @@
 import json
 from unittest import mock
 
-mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()  # мок для редис кэша, чтобы при тестировании не было ошибок с внешним redis cache
+mock.patch(
+    "fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f
+).start()  # мок для редис кэша, чтобы при тестировании не было ошибок с внешним redis cache
 
 import pytest
 from httpx import AsyncClient
@@ -46,7 +48,7 @@ async def setup_database(check_test_mode):
     with open("tests/mock_rooms.json", encoding="utf-8") as file_rooms:
         rooms_json_data = json.load(file_rooms)
 
-    hotels_data = [HotelAdd.model_validate(hotel_json_data) for hotel_json_data in hotels_json_data]   
+    hotels_data = [HotelAdd.model_validate(hotel_json_data) for hotel_json_data in hotels_json_data]
     rooms_data = [RoomAdd.model_validate(room_json_data) for room_json_data in rooms_json_data]
 
     async with DBManager(session_factory=async_session_maker) as db_:
@@ -63,25 +65,11 @@ async def ac() -> AsyncClient:  # type: ignore
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(ac, setup_database):
-    await ac.post(
-        "/auth/register",
-        json={
-            "email": "mark@gmail.com",
-            "password": "12345"
-        }
-    )
+    await ac.post("/auth/register", json={"email": "mark@gmail.com", "password": "12345"})
 
 
 @pytest.fixture(scope="session", autouse=True)
 async def authentificated_ac(ac, register_user):
-    await ac.post(
-        "/auth/login",
-        json={
-            "email": "mark@gmail.com",
-            "password": "12345"
-        }
-    )
+    await ac.post("/auth/login", json={"email": "mark@gmail.com", "password": "12345"})
     assert ac.cookies["access_token"]
     yield ac
-
-

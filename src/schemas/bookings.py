@@ -15,8 +15,7 @@ class BookingAdd(BaseModel):
     date_from: date
     date_to: date
     price: int
-    
+
 
 class Booking(BookingAdd):
     id: int
-    
