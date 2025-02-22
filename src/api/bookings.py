@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Body
 from fastapi_cache.decorator import cache
 
+from src.schemas.hotels import Hotel
+from src.schemas.rooms import Room
 from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingAddRequest, BookingAdd
 
@@ -26,8 +28,8 @@ async def add_booking(
     db: DBDep,
     booking_data: BookingAddRequest = Body(),
 ):
-    room_data = await db.rooms.get_one_or_none(id=booking_data.room_id)
-    hotel_data = await db.hotels.get_one_or_none(id=room_data.hotel_id)
+    room_data: Room | None = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    hotel_data: Hotel | None = await db.hotels.get_one_or_none(id=room_data.hotel_id)
     room_price: int = room_data.price
 
     _booking_data = BookingAdd(

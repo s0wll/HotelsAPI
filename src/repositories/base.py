@@ -1,5 +1,5 @@
 # Базовый репозиторий
-from typing import Sequence
+from typing import Any, Sequence
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
 
@@ -14,16 +14,24 @@ class BaseRepository:
     def __init__(self, session):
         self.session = session
 
-    async def get_filtered(self, *filter, **filter_by):
+    async def get_filtered(self, *filter, **filter_by) -> list[BaseModel | Any]:
         query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)
         return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
-    async def get_all(self, *args, **kwargs):
+    async def get_all(self, *args, **kwargs) -> list[BaseModel | None]:
         return (
             await self.get_filtered()
         )  # Вызываем гет филтред без указания параметров фильтрации, поэтому получаем all
 
+    async def get_one_or_none(self, **filter_by) -> BaseModel | None | Any:
+        query = select(self.model).filter_by(**filter_by)
+        result = await self.session.execute(query)
+        model = result.scalars().one_or_none()
+        if model is None:
+            return None
+        return self.mapper.map_to_domain_entity(model)
+    
     async def get_one_or_none(self, **filter_by):
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
@@ -32,7 +40,7 @@ class BaseRepository:
             return None
         return self.mapper.map_to_domain_entity(model)
 
-    async def add(self, data: BaseModel):
+    async def add(self, data: BaseModel) -> BaseModel | Any:
         add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
