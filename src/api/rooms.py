@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body, Query
 from fastapi_cache.decorator import cache
 
 from src.api.dependencies import DBDep
-from src.schemas.rooms import Room, RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
+from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
 from src.schemas.facilities import RoomFacilityAdd
 
 

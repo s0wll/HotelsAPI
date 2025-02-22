@@ -19,7 +19,7 @@ async def register_user(
         new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
         await db.users.add(new_user_data)
         await db.commit()
-    except:
+    except:  # noqa: E722
         raise HTTPException(status_code=400, detail="Пользователь с таким email уже существует")
     
     return {"status": "OK"}

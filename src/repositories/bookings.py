@@ -1,7 +1,7 @@
 from datetime import date
 
 from fastapi import HTTPException
-from sqlalchemy import select, insert
+from sqlalchemy import select
 
 from src.schemas.bookings import BookingAdd
 from src.repositories.utils import rooms_ids_for_booking

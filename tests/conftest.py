@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 import json
 from unittest import mock
 
@@ -8,7 +9,7 @@ from httpx import AsyncClient
 
 from src.main import app
 from src.database import Base, engine
-from src.models import *
+from src.models import *  # noqa
 from src.config import settings
 from src.utils.db_manager import DBManager
 from src.database import async_session_maker

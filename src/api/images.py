@@ -1,6 +1,6 @@
 import shutil
 
-from fastapi import APIRouter, BackgroundTasks, UploadFile
+from fastapi import APIRouter, UploadFile
 
 from src.tasks.tasks import resize_image
 
