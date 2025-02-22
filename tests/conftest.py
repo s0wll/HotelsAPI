@@ -1,5 +1,6 @@
 # ruff: noqa: E402
 import json
+from typing import AsyncGenerator
 from unittest import mock
 
 mock.patch(
@@ -26,13 +27,13 @@ def check_test_mode():
 
 
 @pytest.fixture(scope="function")
-async def db() -> DBManager:  # type: ignore
+async def db() -> AsyncGenerator[DBManager]:
     async with DBManager(session_factory=async_session_maker) as db:
         yield db
 
 
 @pytest.fixture(scope="module")
-async def db_module() -> DBManager:  # type: ignore
+async def db_module() -> AsyncGenerator[DBManager]:
     async with DBManager(session_factory=async_session_maker) as db_module:
         yield db_module
 
@@ -58,7 +59,7 @@ async def setup_database(check_test_mode):
 
 
 @pytest.fixture(scope="session")
-async def ac() -> AsyncClient:  # type: ignore
+async def ac() -> AsyncGenerator[AsyncClient]:
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 
