@@ -5,7 +5,7 @@ import pytest
     "email, password, status_code",
     [
         ("api_test_user1@gmail.com", "12345", 200),
-        ("api_test_user1@gmail.com", "54321", 400),
+        ("api_test_user1@gmail.com", "54321", 409),
         ("api_test_user2@gmail.com", "12345", 200),
         ("api_test_user3", "12345", 422),
         ("api_test_user3@gmail", "12345", 422),

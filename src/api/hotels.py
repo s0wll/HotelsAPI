@@ -4,6 +4,7 @@ from fastapi import APIRouter, Body, Query
 from fastapi_cache.decorator import cache
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
+from src.exceptions import HotelNotFoundHTTPException, ObjectNotFoundException, check_date_to_after_date_from
 from src.api.dependencies import PaginationDep, DBDep
 from src.schemas.hotels import HotelAdd, HotelPATCH
 
@@ -33,6 +34,7 @@ async def get_hotels(
     date_from: date = Query(example="2025-02-07"),
     date_to: date = Query(example="2025-02-09"),
 ):
+    check_date_to_after_date_from(date_from, date_to)
     print("иду в бд")
     per_page = pagination.per_page or 5
     return await db.hotels.get_filtered_by_time(
@@ -52,12 +54,13 @@ async def get_hotels(
 @router.get("/{hotel_id}")
 @cache(expire=10)
 async def get_hotel(hotel_id: int, db: DBDep):
-    return await db.hotels.get_one_or_none(id=hotel_id)
+    try:
+        return await db.hotels.get_one(id=hotel_id)
+    except ObjectNotFoundException:
+        raise HotelNotFoundHTTPException
 
 
 """Создание POST ручки на добавление отелей"""
-
-
 @router.post(
     "",
     summary="Добавление отеля",
