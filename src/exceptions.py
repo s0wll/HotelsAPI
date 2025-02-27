@@ -14,6 +14,14 @@ class ObjectNotFoundException(Booking_ServiceException):
     detail = "Объект не найден"
 
 
+class RoomNotFoundException(ObjectNotFoundException):
+    detail = "Номер не найден"
+
+
+class HotelNotFoundException(ObjectNotFoundException):
+    detail = "Отель не найден"
+
+
 class ObjectAlreadyExistsException(Booking_ServiceException):
     detail = "Похожий объект уже существует"
 
