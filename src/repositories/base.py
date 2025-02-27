@@ -1,5 +1,7 @@
 # Базовый репозиторий
+import logging
 from typing import Any, Sequence
+
 from sqlalchemy import select, insert, update, delete
 from pydantic import BaseModel
 from sqlalchemy.exc import NoResultFound, IntegrityError
@@ -51,10 +53,15 @@ class BaseRepository:
             model = result.scalars().one()
             return self.mapper.map_to_domain_entity(model)
         except IntegrityError as ex:
-            print(f"{type(ex.orig.__cause__)}")
+            logging.error(
+                f"Не удалось добавить данные в БД, входные данные={data}, тип ошибки: {type(ex.orig.__cause__)=}"
+            )
             if isinstance(ex.orig.__cause__, UniqueViolationError):
                 raise ObjectAlreadyExistsException from ex
             else:
+                logging.error(
+                    f"Незнакомая ошибка, не удалось добавить данные в БД, входные данные={data}, тип ошибки: {type(ex.orig.__cause__)=}"
+                )
                 raise ex
 
 
