@@ -4,7 +4,8 @@ from fastapi import APIRouter, Body, Query
 from fastapi_cache.decorator import cache
 
 # from src.database import engine  # Импорт объекта класса из файла database.py для Дебага запросов
-from src.exceptions import HotelNotFoundHTTPException, ObjectNotFoundException, check_date_to_after_date_from
+from src.services.hotels import HotelsService
+from src.exceptions import HotelNotFoundHTTPException, ObjectNotFoundException
 from src.api.dependencies import PaginationDep, DBDep
 from src.schemas.hotels import HotelAdd, HotelPATCH
 
@@ -34,28 +35,21 @@ async def get_hotels(
     date_from: date = Query(example="2025-02-07"),
     date_to: date = Query(example="2025-02-09"),
 ):
-    check_date_to_after_date_from(date_from, date_to)
-    print("иду в бд")
-    per_page = pagination.per_page or 5
-    return await db.hotels.get_filtered_by_time(
-        date_from=date_from,
-        date_to=date_to,
-        title=title,
-        location=location,
-        limit=per_page,
-        offset=per_page * (pagination.page - 1),
+    return await HotelsService(db).get_filtered_by_time(
+        pagination,
+        title,
+        location,
+        date_from,
+        date_to,
     )
-    # commit() не нужно вызывать в select, т.к. commit() нужно вызывать когда мы хотим внести изменения в БД и зафиксировать это
-
+    
 
 """Ручка на получение одного отеля"""
-
-
 @router.get("/{hotel_id}")
 @cache(expire=10)
 async def get_hotel(hotel_id: int, db: DBDep):
     try:
-        return await db.hotels.get_one(id=hotel_id)
+        return await HotelsService(db).get_hotel(hotel_id)
     except ObjectNotFoundException:
         raise HotelNotFoundHTTPException
 
@@ -87,15 +81,12 @@ async def create_hotel(
         }
     ),
 ):
-    hotel = await db.hotels.add(hotel_data)
-    await db.commit()
+    hotel = await HotelsService(db).add_hotel(hotel_data)
     # print(add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True}))  # Вывод SQL запроса в консоль для дебага (делается только на этапе разработки для себя)
     return {"status": "OK", "data": hotel}
 
 
 """Создание PUT ручки для полного изменения отеля (кроме id)"""
-
-
 @router.put(
     "/{hotel_id}",
     summary="Полное изменение отеля",
@@ -106,8 +97,7 @@ async def edit_hotel(
     hotel_data: HotelAdd,  # Использование в качестве параметров атрибуты из класса Hotel
     db: DBDep,
 ):
-    await db.hotels.edit(hotel_data, id=hotel_id)
-    await db.commit()
+    await HotelsService(db).edit_hotel(hotel_id, hotel_data)
     return {"status": "OK"}
 
 
@@ -124,8 +114,7 @@ async def partially_edit_hotel(
     hotel_data: HotelPATCH,
     db: DBDep,
 ):
-    await db.hotels.edit(hotel_data, exclude_unset=True, id=hotel_id)
-    await db.commit()
+    await HotelsService(db).partially_edit_hotel(hotel_id, hotel_data)
     return {"status": "OK"}
 
 
@@ -138,6 +127,5 @@ async def partially_edit_hotel(
     description="Тут можно удалить определенный отель",
 )
 async def delete_hotel(hotel_id: int, db: DBDep):
-    await db.hotels.delete(id=hotel_id)
-    await db.commit()
+    await HotelsService(db).delete_hotel(hotel_id)
     return {"status": "OK"}
