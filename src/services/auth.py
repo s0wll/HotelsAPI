@@ -54,18 +54,16 @@ class AuthService(BaseService):
     async def login_user(
         self,
         data: UserRequestAdd,
-        response: Response,
-    ):
+    ) -> str:
         user = await self.db.users.get_user_with_hashed_password(email=data.email)
         if not user:
             raise UserNotFoundException
         if not self.verify_password(data.password, user.hashed_password):
             raise IncorrectPasswordException
         access_token = self.create_access_token({"user_id": user.id})
-        response.set_cookie("access_token", access_token)
         return access_token
 
-    async def get_me(self, user_id: int):
+    async def get_one_or_none_user(self, user_id: int):
         return await self.db.users.get_one_or_none(id=user_id)
     
     async def logout(self, response: Response):

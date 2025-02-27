@@ -29,18 +29,18 @@ async def login_user(
     db: DBDep,
 ):
     try:
-        user_access_token = await AuthService(db).login_user(data, response)
+        access_token = await AuthService(db).login_user(data)
     except UserNotFoundException:
         raise UserEmailNotFoundException
     except IncorrectPasswordException:
         raise IncorrectPasswordHTTPException
-    return {"access_token": user_access_token}
+    response.set_cookie("access_token", access_token)
+    return {"access_token": access_token}
 
 
 @router.get("/me")  # Ручка на получение данных аутентифицированного пользователя (id)
 async def get_me(user_id: UserIdDep, db: DBDep):
-    user = await AuthService(db).get_me(user_id)
-    return user
+    return await AuthService(db).get_one_or_none_user(user_id)
 
 
 @router.post("/logout")
