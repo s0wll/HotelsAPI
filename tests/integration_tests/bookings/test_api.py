@@ -1,6 +1,11 @@
 import pytest
 
 
+async def test_get_bookings(ac):
+    response = await ac.get("/bookings")
+    assert response.status_code == 200
+
+
 @pytest.mark.parametrize(
     "room_id, date_from, date_to, status_code",
     [

@@ -22,12 +22,28 @@ class HotelNotFoundException(ObjectNotFoundException):
     detail = "Отель не найден"
 
 
+class UserNotFoundException(ObjectNotFoundException):
+    detail = "Пользователь не найден"
+
+
+class IncorrectPasswordException(Booking_ServiceException):
+    detail = "Неверный пароль"
+
+
 class ObjectAlreadyExistsException(Booking_ServiceException):
     detail = "Похожий объект уже существует"
 
 
+class UserAlreadyExistsException(ObjectAlreadyExistsException):
+    detail = "Пользователь уже существует"
+
+
 class AllRoomsAreBookedException(Booking_ServiceException):
     detail = "Не осталось свободных номеров"
+
+
+class IncorrectTokenException(Booking_ServiceException):
+    detail = "Некорректный токен"
 
 
 def check_date_to_after_date_from(date_from: date, date_to: date) -> None:
@@ -51,3 +67,33 @@ class HotelNotFoundHTTPException(Booking_ServiceHTTPException):
 class RoomNotFoundHTTPException(Booking_ServiceHTTPException):
     status_code = 404
     detail = "Номер не найден"
+
+
+class AllRoomsAreBookedHTTPException(Booking_ServiceHTTPException):
+    status_code = 409
+    detail = "Не осталось свободных номеров"
+
+
+class IncorrectTokenHTTPException(Booking_ServiceHTTPException):
+    status_code = 401
+    detail = "Некорректный токен"
+
+
+class UserEmailAlreadyExistsHTTPException(Booking_ServiceHTTPException):
+    status_code = 409
+    detail = "Пользователь с такой почтой уже существует"
+
+
+class UserEmailNotFoundException(Booking_ServiceHTTPException):
+    status_code = 401
+    detail = "Пользователь с такой почтой не найден"
+
+
+class IncorrectPasswordHTTPException(Booking_ServiceHTTPException):
+    status_code = 401
+    detail = "Неверный пароль"
+
+
+class NotAuthenticatedHTTPException(Booking_ServiceHTTPException):
+    status_code = 401
+    detail="Вы не аутентифицированны/Вы не предоставили токен доступа"
