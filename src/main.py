@@ -10,7 +10,7 @@ import uvicorn
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 from src.init import redis_connector
 from src.api.auth import router as router_auth  # Импорт роутера auth
@@ -52,4 +52,4 @@ def func():
 
 
 if __name__ == "__main__":  # Запуск приложения сервера через uvicorn
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", reload=True)
