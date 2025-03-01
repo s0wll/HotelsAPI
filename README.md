@@ -1,7 +1,8 @@
 # Booking API:
 
-# h1 Выполните команду 
-git clone git@github.com:s0wll/HotelsAPI.git
+### Подготовка к запуску приложения
+##### Выполните команду, находясь в созданной вами директории:
+`git clone git@github.com:s0wll/HotelsAPI.git`
 
 В директории проекта создайте файл .env и установите следующие значения переменным окружения:
 MODE=LOCAL
