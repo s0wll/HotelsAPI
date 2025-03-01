@@ -4,7 +4,13 @@ from fastapi import Response
 from passlib.context import CryptContext
 import jwt
 
-from src.exceptions import IncorrectPasswordException, IncorrectTokenException, ObjectAlreadyExistsException, UserAlreadyExistsException, UserNotFoundException
+from src.exceptions import (
+    IncorrectPasswordException,
+    IncorrectTokenException,
+    ObjectAlreadyExistsException,
+    UserAlreadyExistsException,
+    UserNotFoundException,
+)
 from src.schemas.users import UserAdd, UserRequestAdd
 from src.config import settings
 from src.services.base import BaseService
@@ -38,7 +44,7 @@ class AuthService(BaseService):
         except jwt.exceptions.DecodeError:
             # raise HTTPException(status_code=401, detail="Неверный токен")
             raise IncorrectTokenException
-        
+
     async def register_user(
         self,
         data: UserRequestAdd,
@@ -50,7 +56,7 @@ class AuthService(BaseService):
             await self.db.commit()
         except ObjectAlreadyExistsException as ex:
             raise UserAlreadyExistsException from ex
-        
+
     async def login_user(
         self,
         data: UserRequestAdd,
@@ -65,6 +71,6 @@ class AuthService(BaseService):
 
     async def get_one_or_none_user(self, user_id: int):
         return await self.db.users.get_one_or_none(id=user_id)
-    
+
     async def logout(self, response: Response):
         response.delete_cookie("access_token")

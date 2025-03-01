@@ -42,9 +42,11 @@ async def get_hotels(
         date_from,
         date_to,
     )
-    
+
 
 """Ручка на получение одного отеля"""
+
+
 @router.get("/{hotel_id}")
 @cache(expire=10)
 async def get_hotel(hotel_id: int, db: DBDep):
@@ -55,6 +57,8 @@ async def get_hotel(hotel_id: int, db: DBDep):
 
 
 """Создание POST ручки на добавление отелей"""
+
+
 @router.post(
     "",
     summary="Добавление отеля",
@@ -87,6 +91,8 @@ async def create_hotel(
 
 
 """Создание PUT ручки для полного изменения отеля (кроме id)"""
+
+
 @router.put(
     "/{hotel_id}",
     summary="Полное изменение отеля",

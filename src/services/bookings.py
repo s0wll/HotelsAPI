@@ -1,5 +1,10 @@
 from src.schemas.hotels import Hotel
-from src.exceptions import AllRoomsAreBookedException, Booking_ServiceException, ObjectNotFoundException, RoomNotFoundException
+from src.exceptions import (
+    AllRoomsAreBookedException,
+    Booking_ServiceException,
+    ObjectNotFoundException,
+    RoomNotFoundException,
+)
 from src.schemas.rooms import Room
 from src.schemas.bookings import BookingAdd, BookingAddRequest
 from src.api.dependencies import UserIdDep
@@ -9,10 +14,10 @@ from src.services.base import BaseService
 class BookingsService(BaseService):
     async def get_bookings(self):
         return await self.db.bookings.get_all()
-    
+
     async def get_my_bookings(self, user_id: UserIdDep):
         return await self.db.bookings.get_filtered(user_id=user_id)
-    
+
     async def add_booking(
         self,
         user_id: UserIdDep,

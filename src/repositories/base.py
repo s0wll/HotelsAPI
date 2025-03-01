@@ -36,7 +36,7 @@ class BaseRepository:
         if model is None:
             return None
         return self.mapper.map_to_domain_entity(model)
-    
+
     async def get_one(self, **filter_by) -> BaseModel:
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
@@ -63,7 +63,6 @@ class BaseRepository:
                     f"Незнакомая ошибка, не удалось добавить данные в БД, входные данные={data}, тип ошибки: {type(ex.orig.__cause__)=}"
                 )
                 raise ex
-
 
     async def add_bulk(self, data: Sequence[BaseModel]):
         add_data_stmt = insert(self.model).values([item.model_dump() for item in data])

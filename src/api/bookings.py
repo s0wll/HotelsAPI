@@ -2,7 +2,12 @@ from fastapi import APIRouter, Body
 from fastapi_cache.decorator import cache
 
 from src.services.bookings import BookingsService
-from src.exceptions import AllRoomsAreBookedException, AllRoomsAreBookedHTTPException, RoomNotFoundException, RoomNotFoundHTTPException
+from src.exceptions import (
+    AllRoomsAreBookedException,
+    AllRoomsAreBookedHTTPException,
+    RoomNotFoundException,
+    RoomNotFoundHTTPException,
+)
 from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingAddRequest
 

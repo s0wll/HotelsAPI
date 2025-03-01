@@ -1,7 +1,14 @@
 # API ручки для /users(endpoints)
 from fastapi import APIRouter, Response
 
-from src.exceptions import IncorrectPasswordException, IncorrectPasswordHTTPException, UserAlreadyExistsException, UserEmailAlreadyExistsHTTPException, UserEmailNotFoundException, UserNotFoundException
+from src.exceptions import (
+    IncorrectPasswordException,
+    IncorrectPasswordHTTPException,
+    UserAlreadyExistsException,
+    UserEmailAlreadyExistsHTTPException,
+    UserEmailNotFoundException,
+    UserNotFoundException,
+)
 from src.api.dependencies import UserIdDep, DBDep
 from src.services.auth import AuthService
 from src.schemas.users import UserRequestAdd

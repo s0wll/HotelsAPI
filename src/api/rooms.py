@@ -4,7 +4,12 @@ from fastapi import APIRouter, Body, Query
 from fastapi_cache.decorator import cache
 
 from src.services.rooms import RoomsService
-from src.exceptions import HotelNotFoundException, HotelNotFoundHTTPException, RoomNotFoundException, RoomNotFoundHTTPException
+from src.exceptions import (
+    HotelNotFoundException,
+    HotelNotFoundHTTPException,
+    RoomNotFoundException,
+    RoomNotFoundHTTPException,
+)
 from src.api.dependencies import DBDep
 from src.schemas.rooms import RoomAddRequest, RoomPatchRequest
 
