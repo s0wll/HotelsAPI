@@ -17,6 +17,12 @@ docker run --name booking_cache \
     --network=my_network \
     -d redis:7
 
+# Запуск Nginx
+docker run --name booking_nginx \
+    --volume ./nginx.conf:/etc/nginx/nginx.conf \
+    --network=my_network \
+    --rm -p 80:80 nginx
+
 # Все это через docker compose
 docker run --name booking_back \
     -p 7777:8000 \
