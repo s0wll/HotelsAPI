@@ -1,5 +1,7 @@
+# Создание докер сети
 docker network create my_network
 
+# Запуск БД
 docker run --name booking_db \
     -p 6432:5432 \
     -e POSTGRES_USER=booking_user \
@@ -9,11 +11,13 @@ docker run --name booking_db \
     --volume pg-booking-data:/var/lib/postgresql/data \
     -d postgres:17.2
 
+# Запуск редис кэша
 docker run --name booking_cache \
     -p 7379:6379 \
     --network=my_network \
     -d redis:7
 
+# Все это через docker compose
 docker run --name booking_back \
     -p 7777:8000 \
     --network=my_network \
@@ -32,3 +36,8 @@ docker run --name booking_celery_beat \
 docker build -t booking_app_image .
 
 docker rm booking_back  # remove the container
+
+# Команды для Docker compose
+docker compose up --build
+docker compose up -d --build
+docker logs --follow booking_back
